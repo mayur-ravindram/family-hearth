@@ -1,0 +1,527 @@
+{
+	"info": {
+		"_postman_id": "f8d0a7c1-c1b1-4e6a-9e1c-0c1d1e1e1e1e",
+		"name": "FamilyHearth API",
+		"description": "A collection of requests to test the FamilyHearth API, organized by domain.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Onboarding & Invites",
+			"description": "Requests for creating families and managing invitations.",
+			"item": [
+				{
+					"name": "Create New Family (First User)",
+					"description": "Creates a new family and an admin user. NOTE: This endpoint no longer returns a JWT. The new admin must log in via the standard /auth/magic-link flow.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", () => pm.response.to.have.status(201));",
+									"const response = pm.response.json();",
+									"pm.test(\"Response has family information\", () => {",
+									"    pm.expect(response.family).to.have.property('id');",
+									"});",
+									"pm.environment.set(\"familyId\", response.family.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"The Belcher Family\",\n    \"timezone\": \"America/New_York\",\n    \"adminName\": \"Bob Belcher\",\n    \"adminEmail\": \"bob@bobsburgers.com\",\n    \"phone\": \"555-1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/families",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Invite Code (as Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maxUses\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/families/{{familyId}}/invites",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families",
+								"{{familyId}}",
+								"invites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Invite (New User)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Linda Belcher\",\n    \"email\": \"linda@bobsburgers.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/invites/{{inviteCode}}/accept",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"invites",
+								"{{inviteCode}}",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Authentication",
+			"description": "Requests for authenticating a user and refreshing tokens.",
+			"item": [
+				{
+					"name": "Send Magic Link (for Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"bob@bobsburgers.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/magic-link",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"magic-link"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Magic Link",
+					"description": "NOTE: Since there is no email service, you must manually get the token from the 'magic_link_tokens' table in the database and paste it into the 'magicLinkToken' environment variable before running this request.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+									"const response = pm.response.json();",
+									"pm.test(\"Response has access and refresh tokens\", () => {",
+									"    pm.expect(response).to.have.property('accessToken');",
+									"    pm.expect(response).to.have.property('refreshToken');",
+									"});",
+									"pm.environment.set(\"accessToken\", response.accessToken);",
+									"pm.environment.set(\"refreshToken\", response.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"{{magicLinkToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+									"const response = pm.response.json();",
+									"pm.test(\"Response has a new access token\", () => {",
+									"    pm.expect(response).to.have.property('accessToken');",
+									"});",
+									"// Update the accessToken for subsequent requests",
+									"pm.environment.set(\"accessToken\", response.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. User",
+			"item": [
+				{
+					"name": "Get My Family",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/me/family",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"family"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Media & Posts",
+			"description": "Requests for uploading media and creating/viewing posts.",
+			"item": [
+				{
+					"name": "Get Upload URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+									"const response = pm.response.json();",
+									"pm.environment.set(\"mediaId\", response.mediaId);",
+									"pm.environment.set(\"uploadUrl\", response.uploadUrl);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contentType\": \"image/jpeg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media/signed-url",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"signed-url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "image/jpeg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "binary",
+							"binary": {
+								"src": "path/to/your/file.jpg"
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{uploadUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{uploadUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Upload",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mediaId\": {{mediaId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media/confirm",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"confirm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Post with Media",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+									"const response = pm.response.json();",
+									"pm.environment.set(\"storagePath\", response.media[0].storagePath);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"text_and_media\",\n    \"content\": {\n        \"text\": \"Here's a great photo from our trip!\"\n    },\n    \"mediaIds\": [\n        {{mediaId}}\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Uploaded File",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/media/files/{{storagePath}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"files",
+								"{{storagePath}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Posts (First Page)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+									"pm.environment.set(\"nextCursor\", pm.response.json().nextCursor);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/families/{{familyId}}/posts?limit=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"families",
+								"{{familyId}}",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1"
+		}
+	]
+}

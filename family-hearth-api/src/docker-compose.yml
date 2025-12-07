@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: family_hearth_db
+    environment:
+      POSTGRES_DB: family_hearth
+      POSTGRES_USER: fh_user
+      POSTGRES_PASSWORD: fh_password
+    volumes:
+      - fh_pgdata:/var/lib/postgresql/data
+      - ./migration_to_postgres:/docker-entrypoint-initdb.d  # optional: run init sql on first boot
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/family_hearth
+      SPRING_DATASOURCE_USERNAME: fh_user
+      SPRING_DATASOURCE_PASSWORD: fh_password
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    command: ["java","-jar","/app/app.jar"]
+
+volumes:
+  fh_pgdata:

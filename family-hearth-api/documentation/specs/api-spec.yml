@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: FamilyHearth API
+  version: 1.0.0
+  description: API for the FamilyHearth social application.
+
+... (The rest of the file remains the same, as it already uses "FamilyHearth API") ...

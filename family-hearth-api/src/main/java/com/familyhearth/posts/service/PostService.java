@@ -45,7 +45,11 @@ public class PostService {
         post.setAuthorId(userId);
         post.setFamilyId(familyId);
         post.setType(request.getType());
-        post.setContentJson(request.getContent());
+        if (request.getContent() != null) {
+            post.setContentJson(request.getContent());
+        } else {
+            post.setContentJson(Collections.emptyMap());
+        }
 
         if (request.getMediaIds() != null && !request.getMediaIds().isEmpty()) {
             List<Media> mediaItems = mediaRepository.findAllById(request.getMediaIds());

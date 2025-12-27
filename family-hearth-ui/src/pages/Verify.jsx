@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { verifyMagicLink } from '../api';
+import { verifyToken } from '../api';
 import { useAuth } from '../AuthContext';
 
 function Verify() {
@@ -34,11 +34,18 @@ function Verify() {
       setLoading(true);
 
       try {
-        const response = await verifyMagicLink(paramToken);
+        const response = await verifyToken(paramToken);
         const { accessToken: newAccessToken, refreshToken } = response.data;
         if (newAccessToken) {
           login({ accessToken: newAccessToken, refreshToken });
-          navigate('/dashboard');
+          
+          const redirectPath = localStorage.getItem('redirectAfterLogin');
+          if (redirectPath) {
+            localStorage.removeItem('redirectAfterLogin');
+            navigate(redirectPath);
+          } else {
+            navigate('/dashboard');
+          }
         } else {
           throw new Error('No accessToken returned from server.');
         }

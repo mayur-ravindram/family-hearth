@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE,
     phone TEXT,
     role TEXT,
+    avatar_url TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 

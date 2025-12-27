@@ -30,9 +30,8 @@ springdoc:
 # ===================================================================
 #   Storage Configuration
 # ===================================================================
-# storage:
-#   location: C:/dev/familyhearth-uploads # Example for Windows
-#   # location: /var/data/familyhearth-uploads # Example for Linux/macOS
+storage:
+  location: C:/Users/DELL/family-hearth/uploads
 
 application:
   security:

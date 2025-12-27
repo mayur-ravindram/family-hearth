@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { getCurrentUser } from './api';
+import { getCurrentUser } from './authedApi';
 
 const AuthContext = createContext(null);
 
@@ -23,8 +23,11 @@ export const AuthProvider = ({ children }) => {
           console.log('AuthContext: User fetched successfully:', response.data);
         } catch (error) {
           console.error("AuthContext: Failed to fetch user, token might be invalid.", error);
-          setAuthError('Your session has expired or is invalid. Please log in again.');
-          logout(); // Clear invalid token
+          if (error.response && error.response.status !== 401) {
+            setAuthError('Your session has expired or is invalid. Please log in again.');
+            logout(); // Clear invalid token
+          }
+          // The 401 error will be handled by the interceptor in authedApi.js
         } finally {
           setLoading(false); // Always set loading to false after attempt
           console.log('AuthContext: fetchUser completed, loading set to false.');

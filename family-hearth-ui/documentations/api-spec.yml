@@ -184,6 +184,7 @@
         "tags": [
           "invite-controller"
         ],
+        "description": "Accepts an invite to join a family. The user must be authenticated (in the system) to proceed. If the user is not yet registered, the app should onboard the user (via Magic Link flow) before calling this endpoint.",
         "operationId": "acceptInvite",
         "parameters": [
           {
@@ -366,12 +367,72 @@
         }
       }
     },
+    "/auth/dev/login": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "Developer login (Bypass magic link)",
+        "description": "Direct login for development and testing purposes. Skips email verification.",
+        "operationId": "devLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MagicLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyTokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
           "user-controller"
         ],
         "operationId": "getMe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateMe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -805,6 +866,14 @@
           }
         }
       },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "avatarFileId": {
+            "type": "string"
+          }
+        }
+      },
       "UserDto": {
         "type": "object",
         "properties": {
@@ -819,6 +888,9 @@
             "type": "string"
           },
           "email": {
+            "type": "string"
+          },
+          "avatarUrl": {
             "type": "string"
           }
         }

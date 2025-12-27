@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { Navigate, Link } from 'react-router-dom';
-import { getPosts, getMyFamily } from '../api';
+import { getPosts, getMyFamily } from '../authedApi';
 import { FixedSizeList as List } from 'react-window';
 
 const MediaItem = ({ mediaItem }) => {

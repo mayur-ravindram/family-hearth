@@ -4,15 +4,20 @@ import com.familyhearth.media.model.Media;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString(exclude = "media")
 @Table(name = "posts")
 public class Post {
     @Id
@@ -36,5 +41,18 @@ public class Post {
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Post post = (Post) o;
+        return id != null && Objects.equals(id, post.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

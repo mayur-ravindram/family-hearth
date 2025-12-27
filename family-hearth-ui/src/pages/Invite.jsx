@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
-import { createInvite } from '../api';
+import { createInvite } from '../authedApi';
 import { Link } from 'react-router-dom';
 
 function Invite() {

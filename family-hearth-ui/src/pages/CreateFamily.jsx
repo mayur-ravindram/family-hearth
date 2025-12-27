@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createFamily } from '../api';
+import { createFamily } from '../authedApi';
 
 function CreateFamily() {
   const [name, setName] = useState('');

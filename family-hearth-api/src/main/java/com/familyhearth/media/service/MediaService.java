@@ -98,7 +98,6 @@ public class MediaService {
             throw new IllegalStateException("Media is not in PENDING state.");
         }
 
-        Files.createDirectories(tempDir);
         // Use the full filename from storagePath for the temporary file
         Path tempFile = this.tempDir.resolve(media.getStoragePath());
         Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
@@ -116,7 +115,6 @@ public class MediaService {
             throw new IllegalStateException("Media is not in UPLOADED state.");
         }
 
-        Files.createDirectories(permanentDir);
         // Use the full filename from storagePath for both temp and permanent files
         Path tempFile = this.tempDir.resolve(media.getStoragePath());
         Path permanentFile = this.permanentDir.resolve(media.getStoragePath());

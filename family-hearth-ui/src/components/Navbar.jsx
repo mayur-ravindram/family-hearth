@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 
 function Navbar() {
-  const { accessToken, logout } = useAuth();
+  const { accessToken, logout, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -13,26 +13,47 @@ function Navbar() {
   const desktopNavLinkClasses = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`;
 
+  const UserAvatar = () => (
+    user?.avatarUrl ? (
+      <img src={user.avatarUrl} alt="User Avatar" className="h-8 w-8 rounded-full object-cover" />
+    ) : (
+      <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-500 p-[2px]">
+        <div className="h-full w-full rounded-full bg-white flex items-center justify-center text-xs font-bold text-gray-600 border border-gray-200">
+          {user && user.firstName ? (user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()) : 'U'}
+        </div>
+      </div>
+    )
+  );
+
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <NavLink to="/" className="text-2xl font-bold">FamilyHearth</NavLink>
+            {/* add poppins style to his NavLink */}
+            <style>
+              @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+            </style>
+            <NavLink to="/" className="text-2xl font-bold" style={{ fontFamily: 'Poppins' }}>
+            TBA
+            </NavLink>
           </div>
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="ml-10 flex items-center space-x-4">
               <NavLink to="/" className={desktopNavLinkClasses}>Home</NavLink>
               {accessToken && (
                 <>
-                  <NavLink to="/dashboard" className={desktopNavLinkClasses}>Dashboard</NavLink>
-                  <NavLink to="/create-post" className={desktopNavLinkClasses}>Create Post</NavLink>
-                  <NavLink to="/create-family" className={desktopNavLinkClasses}>Create Family</NavLink>
-                  <button onClick={logout} className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-700 hover:text-white">Logout</button>
+                  <NavLink to="/dashboard" className={desktopNavLinkClasses}>Family Feed</NavLink>
+                  <NavLink to="/create-post" className={desktopNavLinkClasses}>Share a Moment</NavLink>
+                  <NavLink to="/create-family" className={desktopNavLinkClasses}>Start a Family</NavLink>
+                  <button onClick={logout} className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-700 hover:text-white">Sign Out</button>
+                  <NavLink to="/profile">
+                    <UserAvatar />
+                  </NavLink>
                 </>
               )}
               {!accessToken && (
-                <NavLink to="/login" className={desktopNavLinkClasses}>Login</NavLink>
+                <NavLink to="/login" className={desktopNavLinkClasses}>Sign In</NavLink>
               )}
             </div>
           </div>
@@ -55,14 +76,19 @@ function Navbar() {
           <NavLink to="/" className={navLinkClasses}>Home</NavLink>
           {accessToken && (
             <>
-              <NavLink to="/dashboard" className={navLinkClasses}>Dashboard</NavLink>
-              <NavLink to="/create-post" className={navLinkClasses}>Create Post</NavLink>
-              <NavLink to="/create-family" className={navLinkClasses}>Create Family</NavLink>
-              <button onClick={logout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-700 hover:text-white">Logout</button>
+              <div className="flex items-center justify-between">
+                <NavLink to="/dashboard" className={navLinkClasses}>Family Feed</NavLink>
+                <NavLink to="/profile">
+                  <UserAvatar />
+                </NavLink>
+              </div>
+              <NavLink to="/create-post" className={navLinkClasses}>Share a Moment</NavLink>
+              <NavLink to="/create-family" className={navLinkClasses}>Start a Family</NavLink>
+              <button onClick={logout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-700 hover:text-white">Sign Out</button>
             </>
           )}
           {!accessToken && (
-            <NavLink to="/login" className={navLinkClasses}>Login</NavLink>
+            <NavLink to="/login" className={navLinkClasses}>Sign In</NavLink>
           )}
         </div>
       </div>

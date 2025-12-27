@@ -40,6 +40,11 @@ The FamilyHearth application is a private social media platform for families. It
 - **Content**: A post can contain text and an optional file (image or video).
 - **File Uploads**: The application uses a secure, pre-signed URL mechanism for file uploads, ensuring that files are uploaded directly to a storage service without exposing credentials to the client.
 
+### 6. Profile Management
+
+- **Profile Page**: Users can navigate to a dedicated profile page to view their information.
+- **Avatar Update**: The profile page provides an option for users to upload and set a new avatar image.
+
 ## Sequence Diagram
 
 The following diagram illustrates the user flow from login to viewing the dashboard.

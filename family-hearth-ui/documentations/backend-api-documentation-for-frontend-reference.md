@@ -36,6 +36,27 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 
 ---
 
+### `POST /auth/dev/login`
+- **Summary:** Developer login (Bypass magic link)
+- **Description:** Direct login for development and testing purposes. Skips email verification. **Do not use in production.**
+- **Authentication:** None required.
+- **Request Body:**
+  ```json
+  {
+      "email": "string (format: email)"
+  }
+  ```
+- **Responses:**
+  - `200 OK`: Login successful.
+    ```json
+    {
+        "accessToken": "string",
+        "refreshToken": "string"
+    }
+    ```
+
+---
+
 ### `POST /auth/verify`
 - **Summary:** Verify a magic link token
 - **Authentication:** None required.
@@ -142,13 +163,15 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 
 ### `POST /invites/{code}/accept`
 - **Summary:** Accept an invite
+- **Description:** Accepts an invite to join a family. The user must be authenticated (in the system) to proceed. If the user is not yet registered, the app should onboard the user (via Magic Link flow) before calling this endpoint.
 - **Authentication:** Required.
 - **Parameters:**
   - `code`: string (path)
 - **Request Body:**
   ```json
   {
-      "userId": "integer (format: int64)"
+      "name": "string",
+      "email": "string"
   }
   ```
 - **Responses:**
@@ -162,7 +185,6 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 - **Request Body:**
   ```json
   {
-      "fileName": "string",
       "contentType": "string"
   }
   ```
@@ -320,7 +342,31 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
         "id": "integer (format: int64)",
         "firstName": "string",
         "lastName": "string",
-        "email": "string (format: email)"
+        "email": "string (format: email)",
+        "avatarUrl": "string"
+    }
+    ```
+
+---
+
+### `PATCH /users/me`
+- **Summary:** Update the current user's profile
+- **Authentication:** Required.
+- **Request Body:**
+  ```json
+  {
+      "avatarFileId": "string"
+  }
+  ```
+- **Responses:**
+  - `200 OK`: The updated user profile.
+    ```json
+    {
+        "id": "integer (format: int64)",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string (format: email)",
+        "avatarUrl": "string"
     }
     ```
 
@@ -437,7 +483,6 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 ### `SignedUrlRequest`
 ```json
 {
-    "fileName": "string",
     "contentType": "string"
 }
 ```
@@ -545,6 +590,7 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
     "id": "integer (format: int64)",
     "firstName": "string",
     "lastName": "string",
-    "email": "string (format: email)"
+    "email": "string (format: email)",
+    "avatarUrl": "string"
 }
 ```

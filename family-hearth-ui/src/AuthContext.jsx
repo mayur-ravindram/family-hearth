@@ -60,6 +60,19 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null); // Clear any auth errors on logout
   };
 
+  const refreshUser = async () => {
+    console.log('AuthContext: refreshUser called.');
+    try {
+      const response = await getCurrentUser();
+      setUser(response.data);
+      console.log('AuthContext: User refreshed successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error("AuthContext: Failed to refresh user.", error);
+      // Don't logout here, let interceptor handle 401
+    }
+  };
+
   const value = {
     user,
     accessToken,
@@ -67,6 +80,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     authError, // Expose authError
+    refreshUser,
   };
 
   console.log('AuthContext: Providing value:', value);

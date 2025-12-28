@@ -74,7 +74,7 @@ function ManualVerify() {
               Magic Link Token
             </label>
             <input
-              className="w-full px-4 py-3 text-lg font-mono text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
+              className="w-full px-4 py-3 text-lg font-bold font-mono text-red-500 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out"
               id="token"
               type="text"
               placeholder="Enter token here"

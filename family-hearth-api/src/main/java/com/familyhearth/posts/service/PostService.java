@@ -1,5 +1,6 @@
 package com.familyhearth.posts.service;
 
+import com.familyhearth.comments.repository.CommentRepository;
 import com.familyhearth.media.model.Media;
 import com.familyhearth.media.repository.MediaRepository;
 import com.familyhearth.posts.MediaNotFoundException;
@@ -9,8 +10,12 @@ import com.familyhearth.posts.dto.CreatePostRequest;
 import com.familyhearth.posts.dto.PaginatedPostsResponse;
 import com.familyhearth.posts.dto.PostDto;
 import com.familyhearth.posts.model.Post;
+import com.familyhearth.posts.repository.PostLikeRepository;
 import com.familyhearth.posts.repository.PostRepository;
 import com.familyhearth.user.model.CustomUserDetails;
+import com.familyhearth.user.model.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +39,15 @@ public class PostService {
     @Autowired
     private PostMapper postMapper;
 
+    @Autowired
+    private PostLikeRepository postLikeRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional
     public Post createPost(CreatePostRequest request) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -42,7 +55,10 @@ public class PostService {
         Long familyId = userDetails.getFamilyId();
 
         Post post = new Post();
-        post.setAuthorId(userId);
+        // Use getReference to avoid a DB hit, assuming the user exists (which they must to be authenticated)
+        User author = entityManager.getReference(User.class, userId);
+        post.setAuthor(author);
+        
         post.setFamilyId(familyId);
         post.setType(request.getType());
         if (request.getContent() != null) {
@@ -90,7 +106,33 @@ public class PostService {
             posts = postRepository.findByFamilyIdOrderByCreatedAtDescIdDesc(familyId, pageable);
         }
 
-        List<PostDto> postDtos = posts.stream().map(postMapper::toDto).collect(Collectors.toList());
+        if (posts.isEmpty()) {
+            return new PaginatedPostsResponse(Collections.emptyList(), null);
+        }
+
+        // 1. Collect Post IDs
+        List<Long> postIds = posts.stream().map(Post::getId).collect(Collectors.toList());
+
+        // 2. Batch Fetch Counts and Status
+        Map<Long, Long> likeCounts = postLikeRepository.countLikesByPostIds(postIds).stream()
+                .collect(Collectors.toMap(obj -> (Long) obj[0], obj -> (Long) obj[1]));
+
+        Map<Long, Long> commentCounts = commentRepository.countCommentsByPostIds(postIds).stream()
+                .collect(Collectors.toMap(obj -> (Long) obj[0], obj -> (Long) obj[1]));
+
+        // Get current user ID to check 'isLiked'
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = userDetails.getUserId();
+        Set<Long> likedPostIds = new HashSet<>(postLikeRepository.findLikedPostIds(currentUserId, postIds));
+
+        // 3. Map and Stitch Data
+        List<PostDto> postDtos = posts.stream().map(post -> {
+            PostDto dto = postMapper.toDto(post);
+            dto.setLikeCount(likeCounts.getOrDefault(post.getId(), 0L));
+            dto.setCommentCount(commentCounts.getOrDefault(post.getId(), 0L));
+            dto.setLiked(likedPostIds.contains(post.getId()));
+            return dto;
+        }).collect(Collectors.toList());
 
         String nextCursor = null;
         if (posts.size() == limit) {

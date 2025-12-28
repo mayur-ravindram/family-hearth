@@ -248,7 +248,12 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
         "posts": [
             {
                 "id": "integer (format: int64)",
-                "authorId": "integer (format: int64)",
+                "author": {
+                    "id": "integer (format: int64)",
+                    "firstName": "string",
+                    "lastName": "string",
+                    "avatarUrl": "string"
+                },
                 "type": "string",
                 "contentJson": "object (additionalProperties: true)",
                 "media": [
@@ -285,7 +290,12 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
     ```json
     {
         "id": "integer (format: int64)",
-        "authorId": "integer (format: int64)",
+        "author": {
+            "id": "integer (format: int64)",
+            "firstName": "string",
+            "lastName": "string",
+            "avatarUrl": "string"
+        },
         "type": "string",
         "contentJson": "object (additionalProperties: true)",
         "media": [
@@ -298,6 +308,70 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
         "createdAt": "string (format: date-time)"
     }
     ```
+
+---
+
+### `POST /posts/{postId}/likes`
+- **Summary:** Like a post
+- **Authentication:** Required.
+- **Parameters:**
+  - `postId`: integer (path)
+- **Responses:**
+  - `200 OK`: Post liked successfully.
+
+---
+
+### `DELETE /posts/{postId}/likes`
+- **Summary:** Unlike a post
+- **Authentication:** Required.
+- **Parameters:**
+  - `postId`: integer (path)
+- **Responses:**
+  - `200 OK`: Post unliked successfully.
+
+---
+
+### `GET /posts/{postId}/comments`
+- **Summary:** Get comments for a post
+- **Authentication:** Required.
+- **Parameters:**
+  - `postId`: integer (path)
+- **Responses:**
+  - `200 OK`: List of comments.
+    ```json
+    [
+        "object (ref: CommentDto)"
+    ]
+    ```
+
+---
+
+### `POST /posts/{postId}/comments`
+- **Summary:** Add a comment to a post
+- **Authentication:** Required.
+- **Parameters:**
+  - `postId`: integer (path)
+- **Request Body:**
+  ```json
+  {
+      "content": "string"
+  }
+  ```
+- **Responses:**
+  - `201 Created`: Comment created.
+    ```json
+    "object (ref: CommentDto)"
+    ```
+
+---
+
+### `DELETE /comments/{commentId}`
+- **Summary:** Delete a comment
+- **Authentication:** Required.
+- **Parameters:**
+  - `commentId`: integer (path)
+- **Responses:**
+  - `200 OK`: Comment deleted successfully.
 
 ---
 
@@ -563,13 +637,25 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 ```json
 {
     "id": "integer (format: int64)",
-    "authorId": "integer (format: int64)",
+    "author": "object (ref: AuthorDto)",
     "type": "string",
     "contentJson": "object (additionalProperties: true)",
     "media": [
         "object (ref: MediaDto)"
     ],
     "createdAt": "string (format: date-time)"
+}
+```
+
+---
+
+### `AuthorDto`
+```json
+{
+    "id": "integer (format: int64)",
+    "firstName": "string",
+    "lastName": "string",
+    "avatarUrl": "string"
 }
 ```
 

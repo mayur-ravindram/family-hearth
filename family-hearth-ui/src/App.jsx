@@ -9,10 +9,10 @@ import ManualVerify from './pages/ManualVerify';
 import Invite from './pages/Invite';
 import Onboarding from './pages/Onboarding';
 import AcceptInvite from './pages/AcceptInvite';
-import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import './index.css';
+import Profile from './pages/Profile';
 
 function App() {
   return (

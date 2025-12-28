@@ -79,3 +79,9 @@ export const serveFile = (filename) => authedApi.get(`/media/files/${filename}`)
 
 export const createTimeCapsule = (data) => authedApi.post('/time-capsules', data);
 export const syncBatch = () => authedApi.post('/sync/batch');
+
+export const likePost = (postId) => authedApi.post(`/posts/${postId}/likes`);
+export const unlikePost = (postId) => authedApi.delete(`/posts/${postId}/likes`);
+export const getComments = (postId) => authedApi.get(`/posts/${postId}/comments`);
+export const addComment = (postId, commentData) => authedApi.post(`/posts/${postId}/comments`, commentData);
+

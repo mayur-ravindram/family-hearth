@@ -1,9 +1,11 @@
 package com.familyhearth.posts;
 
 import com.familyhearth.media.model.Media;
+import com.familyhearth.posts.dto.AuthorDto;
 import com.familyhearth.posts.dto.MediaDto;
 import com.familyhearth.posts.dto.PostDto;
 import com.familyhearth.posts.model.Post;
+import com.familyhearth.user.model.User;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -18,6 +20,8 @@ public interface PostMapper {
     List<MediaDto> toDto(List<Media> media);
 
     MediaDto toDto(Media media);
+
+    AuthorDto toDto(User user);
 
     @AfterMapping
     default void handleNullContentJson(Post post, @MappingTarget PostDto postDto) {

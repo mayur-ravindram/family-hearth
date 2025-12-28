@@ -1,6 +1,7 @@
 package com.familyhearth.posts.model;
 
 import com.familyhearth.media.model.Media;
+import com.familyhearth.user.model.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -25,7 +26,11 @@ public class Post {
     private Long id;
 
     private Long familyId;
-    private Long authorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
     private String type;
 
     @Type(JsonType.class)

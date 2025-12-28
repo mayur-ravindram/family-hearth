@@ -159,6 +159,4 @@ function CreatePost() {
         </div>
     </div>
   );
-}
-
-export default CreatePost;
+}export default CreatePost;

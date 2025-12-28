@@ -91,6 +91,9 @@ public class MediaService {
 
     @Transactional
     public void saveTempFile(Long mediaId, InputStream inputStream) throws IOException {
+        if (mediaId == null) {
+            throw new IllegalArgumentException("Media ID cannot be null");
+        }
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new MediaNotFoundException("Media record not found for ID: " + mediaId));
 
@@ -108,6 +111,9 @@ public class MediaService {
 
     @Transactional
     public void confirmMedia(ConfirmMediaRequest request) throws IOException {
+        if (request.getMediaId() == null) {
+            throw new IllegalArgumentException("Media ID cannot be null");
+        }
         Media media = mediaRepository.findById(request.getMediaId())
                 .orElseThrow(() -> new MediaNotFoundException("Media record not found for ID: " + request.getMediaId()));
 

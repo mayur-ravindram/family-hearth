@@ -1,14 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { createSignedUrl, uploadFile, confirmMedia, updateUser } from '../authedApi';
+import { getMediaUrl } from '../utils';
 
-const Profile = () => {
-  const { user, loading, authError } = useAuth();
+import { getPosts } from '../authedApi';
+import PostCard from '../components/PostCard';
+function Profile() {
+  const { user, loading, authError, refreshUser } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState('');
 
+  useEffect(() => {
+    // Fetch the latest user data when the page loads
+    refreshUser();
+    fetchUserPosts();
+
+  }, []);
+
+  const fetchUserPosts = async () => {
+    setPostsLoading(true);
+    setPostsError('');
+    try {
+      const response = await getPosts(user.id);
+      setPosts(response.data.posts);
+    } catch (err) {
+      setPostsError('Failed to load your posts.');
+      console.error('Profile: Error fetching user posts.', err);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -21,6 +48,8 @@ const Profile = () => {
     }
   };
 
+
+
   const handleUpload = async () => {
     if (!selectedFile) {
       setError('Please select a file first.');
@@ -29,6 +58,7 @@ const Profile = () => {
 
     setUploading(true);
     setError('');
+    setSuccess('');
 
     try {
       // 1. Get a signed URL from the backend
@@ -44,11 +74,16 @@ const Profile = () => {
       await confirmMedia({ fileId });
 
       // 4. Update the user's profile to set the new avatar
-      // This is the new API call we need to add to the backend.
       await updateUser({ avatarFileId: fileId });
 
-      // TODO: Refresh the user context to show the new avatar immediately.
-      alert('Profile picture updated successfully! It may take a moment to update everywhere.');
+      // 5. Refresh the user context to show the new avatar immediately
+      await refreshUser();
+
+      setSuccess('Profile picture updated successfully!');
+      setPreview(null);
+      setSelectedFile(null);
+      setTimeout(() => setSuccess(''), 3000);
+
 
     } catch (err) {
       console.error('Upload failed', err);
@@ -58,11 +93,11 @@ const Profile = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !user) {
     return <div>Loading profile...</div>;
   }
 
-  if (authError || !user) {
+  if (authError && !user) {
     return <div>Error loading profile. Please try logging in again.</div>;
   }
 
@@ -71,13 +106,13 @@ const Profile = () => {
       <h1 className="text-2xl font-bold mb-4">Your Profile</h1>
       <div className="flex items-center space-x-4">
         <img
-          src={preview || user.avatarUrl || '/default-avatar.png'}
+          src={preview || getMediaUrl(user?.avatarUrl) || 'https://via.placeholder.com/150'}
           alt="User Avatar"
           className="w-32 h-32 rounded-full object-cover"
         />
         <div>
-          <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
+          <p><strong>Email:</strong> {user?.email}</p>
         </div>
       </div>
 
@@ -97,6 +132,7 @@ const Profile = () => {
           />
         </div>
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {success && <p className="text-green-500 text-sm mt-2">{success}</p>}
         <div className="mt-4">
           <button
             onClick={handleUpload}
@@ -107,8 +143,27 @@ const Profile = () => {
           </button>
         </div>
       </div>
+      {/* section to load all user's posts */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold">Your Posts</h2>
+        <div className="mt-2">
+          {postsLoading ? (
+            <p>Loading posts...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : posts && posts.length > 0 ? (
+            <div className="space-y-4">
+              {posts.map(post => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <p>No posts yet.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default Profile;

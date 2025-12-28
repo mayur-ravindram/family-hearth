@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { getMediaUrl } from '../utils';
 
 function Navbar() {
   const { accessToken, logout, user } = useAuth();
@@ -15,7 +16,7 @@ function Navbar() {
 
   const UserAvatar = () => (
     user?.avatarUrl ? (
-      <img src={user.avatarUrl} alt="User Avatar" className="h-8 w-8 rounded-full object-cover" />
+      <img src={getMediaUrl(user.avatarUrl)} alt="User Avatar" className="h-8 w-8 rounded-full object-cover" />
     ) : (
       <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-500 p-[2px]">
         <div className="h-full w-full rounded-full bg-white flex items-center justify-center text-xs font-bold text-gray-600 border border-gray-200">

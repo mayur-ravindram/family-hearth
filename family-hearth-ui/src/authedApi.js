@@ -68,7 +68,6 @@ export const getPosts = (familyId, cursor = null, limit = 20) => {
 export const createPost = (postData) => authedApi.post('/posts', postData);
 
 export const createInvite = (familyId, inviteData) => authedApi.post(`/families/${familyId}/invites`, inviteData);
-export const acceptInvite = (code, data) => authedApi.post(`/invites/${code}/accept`, data);
 
 export const createSignedUrl = (data) => authedApi.post('/media/signed-url', data);
 export const uploadFile = (uploadUrl, file) => authedApi.put(uploadUrl, file, {

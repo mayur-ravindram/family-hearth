@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { verifyToken } from '../api';
+import { verifyToken as verifyPublicToken } from '../api';
+import { getCurrentUser } from '../authedApi';
 import { useAuth } from '../AuthContext';
 
 function Verify() {
@@ -12,7 +13,7 @@ function Verify() {
   const isVerificationAttempted = useRef(false); // Use useRef to prevent re-calls
 
   useEffect(() => {
-    const verifyToken = async () => {
+    const verifyAndCheckOnboarding = async () => {
       // If user is already authenticated, redirect to dashboard
       if (accessToken) {
         navigate('/dashboard');
@@ -34,17 +35,31 @@ function Verify() {
       setLoading(true);
 
       try {
-        const response = await verifyToken(paramToken);
+        const response = await verifyPublicToken(paramToken);
         const { accessToken: newAccessToken, refreshToken } = response.data;
+
         if (newAccessToken) {
+          // Temporarily store the token to make the next call
           login({ accessToken: newAccessToken, refreshToken });
-          
-          const redirectPath = localStorage.getItem('redirectAfterLogin');
-          if (redirectPath) {
-            localStorage.removeItem('redirectAfterLogin');
-            navigate(redirectPath);
-          } else {
-            navigate('/dashboard');
+
+          try {
+            await getCurrentUser();
+            // If user exists, proceed as normal
+            const redirectPath = localStorage.getItem('redirectAfterLogin');
+            if (redirectPath) {
+              localStorage.removeItem('redirectAfterLogin');
+              navigate(redirectPath);
+            } else {
+              navigate('/dashboard');
+            }
+          } catch (userError) {
+            // If user fetch returns 404, they need to onboard
+            if (userError.response && userError.response.status === 404) {
+              navigate('/onboarding');
+            } else {
+              // Handle other potential errors during user fetch
+              throw new Error('Failed to check user status.');
+            }
           }
         } else {
           throw new Error('No accessToken returned from server.');
@@ -56,7 +71,7 @@ function Verify() {
       }
     };
 
-    verifyToken();
+    verifyAndCheckOnboarding();
   }, [paramToken, login, navigate, accessToken]); // Added accessToken to dependencies
 
   if (loading) {

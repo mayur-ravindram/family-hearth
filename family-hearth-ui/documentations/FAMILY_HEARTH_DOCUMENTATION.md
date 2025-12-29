@@ -132,3 +132,49 @@ The application is well-structured and follows several modern web development be
     - Consider using a component library like **Material-UI** or **Chakra UI** to build a more consistent and polished user interface with less effort.
 
 By addressing these areas, the FamilyHearth application can evolve into a more robust, scalable, and user-friendly platform.
+
+
+### 6. Sequence Diagrams
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Family Admin
+    actor Invitee as Invitee (New User)
+    participant FE as Frontend
+    participant API as Backend API
+
+    Note over Admin, API: Create Invite Flow
+    Admin->>FE: Click "Invite Member"
+    FE->>API: POST /families/{familyId}/invites
+    API-->>FE: Returns { code, expiresAt }
+    FE->>Admin: Display Invite Link (e.g., app.com/join?code=xyz)
+    Admin->>Invitee: Shares Link (SMS/Email)
+
+    Note over Invitee, API: Accept Invite Flow
+    Invitee->>FE: Opens Invite Link
+    FE->>FE: Check if Authenticated?
+    alt Not Authenticated
+        FE->>Invitee: Show Login / Magic Link Screen
+        Invitee->>FE: Enter Email
+        FE->>API: POST /auth/magic-link
+        API-->>Invitee: Send Email with Code
+        Invitee->>FE: Enter Verification Code
+        FE->>API: POST /auth/verify
+        API-->>FE: Returns { accessToken }
+        
+        Note right of FE: Check if User Exists
+        FE->>API: GET /users/me
+        alt User Profile Not Found (404)
+            FE->>Invitee: Redirect to Onboarding Form
+            Invitee->>FE: Submit Name/Details
+            FE->>API: POST /users (Create Profile)
+            API-->>FE: Success
+        end
+        FE->>FE: Redirect to "Login" (Dashboard)
+    end
+
+    Note right of FE: Finalize Invite Acceptance
+    FE->>API: POST /invites/{code}/accept
+    API-->>FE: Success (Member added to Family)
+    FE->>Invitee: Show Family Dashboard
+```

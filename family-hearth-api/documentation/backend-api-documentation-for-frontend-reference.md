@@ -170,7 +170,9 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 - **Request Body:**
   ```json
   {
-      "name": "string",
+      "firstName": "string",
+      "lastName": "string",
+      "phone": "string",
       "email": "string"
   }
   ```
@@ -218,8 +220,7 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 - **Request Body:**
   ```json
   {
-      "mediaId": "integer (format: int64)",
-      "postId": "integer (format: int64)"
+      "mediaId": "integer (format: int64)"
   }
   ```
 - **Responses:**
@@ -263,7 +264,10 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
                         "type": "string"
                     }
                 ],
-                "createdAt": "string (format: date-time)"
+                "createdAt": "string (format: date-time)",
+                "likeCount": "integer (format: int64)",
+                "commentCount": "integer (format: int64)",
+                "isLiked": "boolean"
             }
         ],
         "nextCursor": "string (nullable)"
@@ -305,7 +309,10 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
                 "type": "string"
             }
         ],
-        "createdAt": "string (format: date-time)"
+        "createdAt": "string (format: date-time)",
+        "likeCount": "integer (format: int64)",
+        "commentCount": "integer (format: int64)",
+        "isLiked": "boolean"
     }
     ```
 
@@ -447,6 +454,21 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 
 ---
 
+### `GET /users/exists`
+- **Summary:** Check if a user exists by email
+- **Authentication:** None required.
+- **Parameters:**
+  - `email`: string (query)
+- **Responses:**
+  - `200 OK`:
+    ```json
+    {
+        "exists": "boolean"
+    }
+    ```
+
+---
+
 ## Schemas
 
 ### `MagicLinkRequest`
@@ -549,7 +571,10 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 ### `AcceptInviteRequest`
 ```json
 {
-    "userId": "integer (format: int64)"
+    "firstName": "string",
+    "lastName": "string",
+    "phone": "string",
+    "email": "string"
 }
 ```
 
@@ -578,8 +603,7 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 ### `ConfirmMediaRequest`
 ```json
 {
-    "mediaId": "integer (format: int64)",
-    "postId": "integer (format: int64)"
+    "mediaId": "integer (format: int64)"
 }
 ```
 
@@ -643,7 +667,10 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
     "media": [
         "object (ref: MediaDto)"
     ],
-    "createdAt": "string (format: date-time)"
+    "createdAt": "string (format: date-time)",
+    "likeCount": "integer (format: int64)",
+    "commentCount": "integer (format: int64)",
+    "isLiked": "boolean"
 }
 ```
 
@@ -689,5 +716,27 @@ The `accessToken` and `refreshToken` are obtained upon successful magic link ver
 ```json
 {
     "avatarFileId": "integer (format: int64)"
+}
+```
+
+---
+
+### `CommentDto`
+```json
+{
+    "id": "integer (format: int64)",
+    "postId": "integer (format: int64)",
+    "author": "object (ref: AuthorDto)",
+    "content": "string",
+    "createdAt": "string (format: date-time)"
+}
+```
+
+---
+
+### `CreateCommentRequest`
+```json
+{
+    "content": "string"
 }
 ```

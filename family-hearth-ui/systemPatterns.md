@@ -55,3 +55,12 @@
   2.  **Direct Upload:** The client uses the received signed URL to upload the file directly to the cloud storage provider (e.g., AWS S3) with a `PUT` request via the `uploadFile` function.
   3.  **Confirm Upload:** After the upload is complete, the client notifies the backend by calling `confirmMedia` (`POST /api/v1/media/confirm`).
   4.  **Associate File:** To link the uploaded file to the user's profile, the client calls `updateUser` (`PATCH /api/v1/users/me`) with the `fileId`, prompting the backend to update the user's `avatarUrl`.
+
+### New User Onboarding Flow
+- **Description:** A new flow to handle users who are not yet registered in the system, especially when they arrive from an invitation link.
+- **Flow:**
+  1.  **Email Check:** When a user attempts to log in, the frontend first calls a new endpoint (`GET /api/v1/users/check?email={email}`) to verify if the user exists.
+  2.  **Existing User:** If the user exists, the normal magic link flow proceeds.
+  3.  **New User Redirection:** If the user does not exist, the frontend redirects them to the `/onboarding` page.
+  4.  **Onboarding:** The onboarding page captures the user's first name, last name, and pre-fills their email. Submitting this form triggers the magic link flow for the new user.
+- **Backend Requirement:** This pattern introduces the need for the `/api/v1/users/check` endpoint on the backend to avoid sending magic links to unregistered users.

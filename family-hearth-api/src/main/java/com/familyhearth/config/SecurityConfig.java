@@ -46,7 +46,7 @@ public class SecurityConfig {
                                 // Public API endpoints
                                 .requestMatchers(HttpMethod.POST, "/auth/**", "/families", "/invites/*/accept").permitAll()
                                 .requestMatchers("/media/upload/**").permitAll() // Allow all methods for upload to avoid 403 on method mismatch
-                                .requestMatchers(HttpMethod.GET, "/media/files/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/media/files/**", "/users/exists").permitAll()
                                 // All other requests must be authenticated
                                 .anyRequest().authenticated()
                 )
@@ -59,7 +59,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Adjust as needed for your frontend
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH "));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
         configuration.setAllowCredentials(true);
 

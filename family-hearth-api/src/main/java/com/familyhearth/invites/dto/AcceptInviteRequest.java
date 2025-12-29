@@ -1,22 +1,11 @@
 package com.familyhearth.invites.dto;
 
+import lombok.Data;
+
+@Data
 public class AcceptInviteRequest {
-    private String name;
+    private String firstName;
+    private String lastName;
+    private String phone;
     private String email;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

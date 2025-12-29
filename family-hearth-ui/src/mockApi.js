@@ -71,9 +71,9 @@ const mockApi = {
           const mockUrl = `/media/upload/${mediaId}`;
           mockMedia[mediaId] = { id: mediaId, url: '', type: data.contentType };
           resolve({ status: 200, data: { url: mockUrl, mediaId: mediaId } });
-        } else if (url === '/media/confirm') {
-          console.log('Mock API: Confirming media', data);
-          resolve({ status: 200, data: { message: 'Media confirmed successfully' } });
+        } else if (url.includes('/invites/') && url.endsWith('/accept')) {
+          console.log('Mock API: Accepting invite', data);
+          resolve({ status: 200, data: { accessToken: MOCK_ACCESS_TOKEN, refreshToken: MOCK_REFRESH_TOKEN } });
         } else {
           reject(new Error(`Mock API: Unhandled POST request to ${url}`));
         }
@@ -109,12 +109,11 @@ const mockApi = {
           console.log('Mock API: Getting current user.');
           // In a real scenario, this would check the access token
           resolve({ status: 200, data: mockUsers['test@example.com'] });
-        } else if (postsMatch) {
-          const familyId = parseInt(postsMatch[1], 10);
-          console.log(`Mock API: Getting posts for familyId: ${familyId}`);
-          // For mock purposes, let's assume familyId corresponds to authorId
-          const userPosts = mockPosts.filter(p => p.authorId === familyId);
-          resolve({ status: 200, data: { posts: userPosts } });
+        } else if (url.startsWith('/users/check')) {
+          const email = new URLSearchParams(url.split('?')[1]).get('email');
+          console.log(`Mock API: Checking if user exists: ${email}`);
+          const exists = !!mockUsers[email];
+          resolve({ status: 200, data: { exists } });
         } else {
           reject(new Error(`Mock API: Unhandled GET request to ${url}`));
         }

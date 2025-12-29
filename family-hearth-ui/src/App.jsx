@@ -28,7 +28,7 @@ function App() {
         <Route path="/auth/verify/:token" element={<Verify />} />
         <Route path="/create-family" element={<ProtectedRoute><CreateFamily /></ProtectedRoute>} />
         <Route path="/invite" element={<ProtectedRoute><Invite /></ProtectedRoute>} />
-        <Route path="/accept-invite/:code" element={<AcceptInvite />} />
+        <Route path="/join/:code" element={<AcceptInvite />} />
         <Route path="/onboarding" element={<Onboarding />} />
       </Routes>
     </Router>

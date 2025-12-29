@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { requestMagicLink } from '../api';
+import { requestMagicLink, checkUserExists } from '../api';
 import { useAuth } from '../AuthContext';
 
 function Login() {
@@ -24,8 +24,13 @@ function Login() {
     setError('');
     setMessage('');
     try {
-      await requestMagicLink(email);
-      setMessage('We\'ve sent a magic link to your email. Check your inbox!');
+      const { data } = await checkUserExists(email);
+      if (data.exists) {
+        await requestMagicLink(email);
+        setMessage('We\'ve sent a magic link to your email. Check your inbox!');
+      } else {
+        navigate('/onboarding', { state: { email } });
+      }
     } catch (err) {
       setError('Failed to send magic link. Please check the email and try again.');
       console.error(err);

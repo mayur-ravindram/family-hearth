@@ -92,7 +92,7 @@ function Onboarding() {
               type="submit"
               disabled={loading}
             >
-              {loading ? 'Sending...' : 'Send Magic Link'}
+              {loading ? 'Sending...' : 'Onboard Me'}
             </button>
           </div>
           {success && <p className="text-green-500 text-center mt-4">{success}</p>}

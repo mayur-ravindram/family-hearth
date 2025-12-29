@@ -27,7 +27,16 @@ The FamilyHearth application is a private social media platform for families. It
 - **Verification**: The user clicks the magic link in their email, which opens the application and verifies the token. Upon successful verification, the user is authenticated and redirected to their dashboard.
 - **Manual Token Verification**: As an alternative, the user can manually copy a token from the email and paste it into a verification form in the application.
 
-### 4. The Dashboard
+### 4. New User Onboarding
+
+- **Email Check**: When a user enters their email to log in, the system first checks if the email already exists in the database.
+- **Existing User**: If the email exists, the standard magic link authentication process is initiated.
+- **New User**: If the email does not exist, the user is redirected to an onboarding page.
+- **Onboarding Form**: On the onboarding page, the user is asked to provide their first name, last name, and email address (which is pre-filled).
+- **Magic Link for New User**: Upon submitting the onboarding form, a magic link is sent to the user's email to verify their account.
+- **Backend Implementation**: This flow requires a new backend endpoint (`GET /api/v1/users/check?email={email}`) to check for user existence. This has been documented in the backend API documentation for implementation.
+
+### 5. The Dashboard
 
 - **Main View**: The dashboard is the central hub of the application, where users can see a feed of their family's posts.
 - **Post Feed**: Posts are displayed in reverse chronological order. Each post shows the author's name, the time of posting, the text content, and any attached media.

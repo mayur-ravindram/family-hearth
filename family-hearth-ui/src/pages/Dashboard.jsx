@@ -1,19 +1,10 @@
 import { useEffect, useState } from 'react';
-
 import { Link } from 'react-router-dom';
-
 import { useAuth } from '../AuthContext';
-
-
-
 import {
   getMyFamily,
-
   getPosts
 } from '../authedApi';
-
-
-
 import PostCard from '../components/PostCard';
 
 function Dashboard() {
@@ -74,14 +65,9 @@ function Dashboard() {
       <main className="max-w-2xl mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-8 max-w-[470px] mx-auto w-full">
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Family Feed</h2>
-            <p className="text-xs text-gray-500">Welcome, {user ? user.firstName : 'User'}</p>
+            <p className="text-xl">Welcome, <span className='font-bold'>{user ? user.firstName : 'User'}</span></p>
           </div>
-          <div className="flex space-x-2">
-            <Link to="/invite" className="text-sm font-semibold text-blue-500 hover:text-blue-700">
-              Invite
-            </Link>
-          </div>
+
         </div>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}

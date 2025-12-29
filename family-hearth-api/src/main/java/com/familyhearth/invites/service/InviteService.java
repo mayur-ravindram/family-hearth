@@ -79,9 +79,9 @@ public class InviteService {
         }
 
         User newUser = new User();
-        String[] nameParts = request.getName().split(" ", 2);
-        newUser.setFirstName(nameParts[0]);
-        newUser.setLastName(nameParts.length > 1 ? nameParts[1] : null);
+        newUser.setFirstName(request.getFirstName());
+        newUser.setLastName(request.getLastName());
+        newUser.setPhone(request.getPhone());
         newUser.setEmail(request.getEmail());
         newUser.setFamilyId(invite.getFamilyId());
         newUser.setRole(Role.ROLE_USER);

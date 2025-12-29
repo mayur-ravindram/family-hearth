@@ -2,8 +2,6 @@
 
 Connecting families — Family Hearth is a small web + Java project intended to help families share updates, photos, and events in a private, family-focused space.
 
-> NOTE: This README is a beginner-friendly template. Replace placeholders (ALL-CAPS) with project-specific commands, package names, paths, and details from your repository.
-
 ---
 
 ## Table of contents
@@ -105,11 +103,3 @@ These are generic steps. Inspect your repository for a build file (pom.xml, buil
 4. Connect frontend & backend
    - Ensure the frontend API endpoints point to the backend host/port (e.g., http://localhost:8080/api)
    - If using CORS, ensure the backend allows requests from your frontend origin
-
-
----
-
-Would you like me to:
-- Inspect this repository and fill in the exact build/run commands (I can look for pom.xml, build.gradle, or package.json)?
-- Generate a LICENSE file or CONTRIBUTING.md?
-If yes, tell me which one and I will fetch the repository files to provide precise instructions.
